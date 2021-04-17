@@ -113,5 +113,9 @@ public class User implements Serializable {
     @TableLogic
     private Integer deleted;
 
+    /**
+     * 头像地址
+     */
+    private String avatar;
 
 }
