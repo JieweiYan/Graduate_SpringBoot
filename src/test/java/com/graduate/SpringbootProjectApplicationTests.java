@@ -26,10 +26,7 @@ class SpringbootProjectApplicationTests {
     @Autowired
     private JusttestMapper justtestMapper;
 
-    @Test
-    void contextLoads() {
-        userMapper.selectById(1);
-    }
+
 //
     @Test
     void saveTest(){

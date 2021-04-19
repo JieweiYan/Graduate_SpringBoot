@@ -71,7 +71,6 @@ public class UserController {
         System.out.println(url);
         //上传完成后删除本地文件
         file.delete();
-
         return url;
     }
 
