@@ -19,7 +19,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @EnableTransactionManagement
-@MapperScan({"com.graduate.user.mapper", "com.graduate.justtest.mapper"})
+@MapperScan({"com.graduate.user.mapper", "com.graduate.justtest.mapper", "com.graduate.classalbum.mapper",
+        "com.graduate.personalbum.mapper"})
 public class MyBatisPlusConfig {
     // 旧版
     @Bean
@@ -28,23 +29,10 @@ public class MyBatisPlusConfig {
         return new PaginationInterceptor();
     }
 
-    //逻辑删除组件
 
 
 
-    //解决跨域问题
-//    @Bean
-//    public WebMvcConfigurer corsConfigurer(){
-//        return new WebMvcConfigurer() {
-//            @Override
-//            public void addCorsMappings(CorsRegistry registry){
-//                registry.addMapping("/**")
-//                        .allowedOrigins("*")
-//                        .allowedMethods("GET", "PUT", "HEAD", "POST", "DELETE", "OPTIONS")
-//                        .allowCredentials(false);
-//            }
-//        };
-//    }
+
 
 
 }

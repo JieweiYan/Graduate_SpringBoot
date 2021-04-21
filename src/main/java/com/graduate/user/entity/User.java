@@ -63,7 +63,7 @@ public class User implements Serializable {
     /**
      * 入学年份
      */
-    private String startYear;
+    private String startyear;
 
     /**
      * 班级
@@ -107,15 +107,13 @@ public class User implements Serializable {
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private Date updateTime;
 
-    /**
-     * 逻辑删除
-     */
-    @TableLogic
-    private Integer deleted;
 
     /**
      * 头像地址
      */
     private String avatar;
+
+    //盐
+    private String salt;
 
 }
