@@ -20,7 +20,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 @EnableTransactionManagement
 @MapperScan({"com.graduate.user.mapper", "com.graduate.justtest.mapper", "com.graduate.classalbum.mapper",
-        "com.graduate.personalbum.mapper"})
+        "com.graduate.personalbum.mapper", "com.graduate.postcontent.mapper"})
 public class MyBatisPlusConfig {
     // 旧版
     @Bean
