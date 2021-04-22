@@ -5,26 +5,23 @@ import com.alibaba.fastjson.JSON;
 import com.graduate.handler.AliyunOSSUtil;
 import com.graduate.user.entity.User;
 import com.graduate.user.mapper.UserMapper;
-import com.sun.org.apache.xml.internal.security.exceptions.Base64DecodingException;
-import com.sun.org.apache.xml.internal.security.utils.Base64;
-import javafx.geometry.Pos;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.web.bind.annotation.*;
-import sun.misc.BASE64Decoder;
-import sun.misc.BASE64Encoder;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static com.yan.Tools.GenerateImage;
-import static com.yan.Tools.base64ToImageOutput;
+import static com.graduate.Utils.RSAUtils.myEncrypt;
+import static com.graduate.user.Tools.base64ToImageOutput;
+import static com.graduate.user.Tools.judgeAuthority;
+
 
 /**
  * <p>
@@ -42,7 +39,7 @@ public class UserController {
     private UserMapper userMapper;
 
     @PostMapping("/login")
-    public String login(@RequestBody User user){
+    public String login(@RequestBody User user) throws Exception {
         HashMap<String, Object> map = new HashMap<>();
         HashMap<String, Object> res = new HashMap<>();
         //自定义查询条件
@@ -55,10 +52,14 @@ public class UserController {
         }
         else{
             User u = list.get(0);
-            System.out.println(DigestUtils.md5Hex(user.getPassword() + u.getSalt()));
-            System.out.println(user.getPassword());
             if(DigestUtils.md5Hex(user.getPassword() + u.getSalt()).equals(u.getPassword())){
                 //已注册并且密码正确
+                //生成token
+                String token = DigestUtils.md5Hex(user.getName() + u.getSalt());
+                u.setToken(token);
+                userMapper.updateById(u);
+                System.out.println(token);
+                //返回前端
                 res.put("flag", "200");
                 res.put("user", u);
             }
@@ -96,6 +97,7 @@ public class UserController {
 
     @PostMapping("/insert")
     public int insert(@RequestBody User user){
+
         return userMapper.insert(user);
     }
 
@@ -106,10 +108,18 @@ public class UserController {
         return i;
     }
 
-    @GetMapping("/findbyid/{id}")
-    public User findbyid(@PathVariable("id") Integer id){
-        System.out.println(id);
-        return userMapper.selectById(id);
+    @GetMapping("/findbyid/{id}/{token}")
+    public User findbyid(@PathVariable("id") Integer id, @PathVariable("token") String token) throws Exception {
+            User user = userMapper.selectById(id);
+            //如果没查到，直接返回空值
+            if(user == null)
+                return null;
+            if(user.getToken().equals(token)){
+                return user;
+            }
+            else{
+                return null;
+            }
     }
 
     @PostMapping("/uploadavatar")
@@ -153,14 +163,22 @@ public class UserController {
         }
     }
 
-    @GetMapping("/getclassmatelist/{id}")
-    public List<User> getClassmateList(@PathVariable("id") Integer id){
+    @GetMapping("/getclassmatelist/{id}/{token}")
+     public List<User> getClassmateList(@PathVariable("id") Integer id,@PathVariable("token") String token){
         User user = userMapper.selectById(id);
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("class1", user.getClass1());
-        map.put("subject", user.getSubject());
-        List<User> list = userMapper.selectByMap(map);
-        return list;
+        //如果没查到，直接返回空值
+        if(user == null)
+            return null;
+        if(user.getToken().equals(token)){
+            HashMap<String, Object> map = new HashMap<>();
+            map.put("class1", user.getClass1());
+            map.put("subject", user.getSubject());
+            List<User> list = userMapper.selectByMap(map);
+            return list;
+        }
+        else{
+            return null;
+        }
     }
 
     //上传个人照片

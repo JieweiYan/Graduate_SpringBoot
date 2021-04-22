@@ -8,6 +8,7 @@ import com.graduate.handler.AliyunOSSUtil;
 import com.graduate.personalbum.entity.Personalbum;
 import com.graduate.personalbum.mapper.PersonalbumMapper;
 import com.graduate.user.entity.User;
+import com.graduate.user.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,7 +20,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.*;
 
-import static com.yan.Tools.base64ToImageOutput;
+import static com.graduate.user.Tools.judgeAuthority;
+
 
 /**
  * <p>
@@ -36,8 +38,11 @@ public class PersonalbumController {
     @Autowired
     private PersonalbumMapper personalbumMapper;
 
+    @Autowired
+    private UserMapper userMapper;
+
     @PostMapping("/uploadalbum/{id}")
-    public String uploadalbum(@RequestParam("avatar") MultipartFile multfile, @PathVariable("id") Integer id) throws IOException {
+    public String uploadalbum(@RequestParam("avatar") MultipartFile multfile, @PathVariable("id") Integer id) throws Exception {
         // 获取文件名
         String fileName = multfile.getOriginalFilename();
         // 获取文件后缀
@@ -63,8 +68,16 @@ public class PersonalbumController {
         return "true";
     }
 
-    @GetMapping("/findbyid/{userid}")
-    public String findbyuserid(@PathVariable("userid") Integer userid){
+    @GetMapping("/findbyid/{userid}/{token}")
+    public String findbyuserid(@PathVariable("userid") Integer userid, @PathVariable("token") String token){
+        System.out.println("hhhhhhhh");
+        User user = userMapper.selectById(userid);
+        //如果没查到，直接返回空值
+        if(user == null)
+            return null;
+        if(!user.getToken().equals(token)){
+            return null;
+        }
         //查出对应用户id的照片，并且按照时间排序
         QueryWrapper<Personalbum> wrapper = new QueryWrapper<>();
         wrapper.eq("userid", userid);
@@ -75,7 +88,6 @@ public class PersonalbumController {
         if(list.size() == 0){
             return JSON.toJSONString(res);
         }
-
         int i = 0;
         for( ; ; ) {
             //每次必须新建list存放，因为java list.add是引用
@@ -96,11 +108,20 @@ public class PersonalbumController {
         return JSON.toJSONString(res);
     }
 
-    @PostMapping("/deletepic/{id}")
-    public int deletepic(@PathVariable("id") Integer id){
-        System.out.println(id);
-        personalbumMapper.deleteById(id);
-        return 200;
+    @PostMapping("/deletepic/{id}/{userid}/{token}")
+    public String deletepic(@PathVariable("id") Integer id, @PathVariable("userid") Integer userid, @PathVariable("token") String token){
+        User user = userMapper.selectById(userid);
+        //如果没查到，直接返回空值
+        if(user == null)
+            return null;
+        if(user.getToken().equals(token)){
+            personalbumMapper.deleteById(id);
+            return "200";
+        }
+        else{
+            return null;
+        }
+
     }
 
 }

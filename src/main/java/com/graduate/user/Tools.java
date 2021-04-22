@@ -1,17 +1,31 @@
-package com.yan;
+package com.graduate.user;
 
+import com.graduate.user.mapper.UserMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import sun.misc.BASE64Decoder;
 
+import javax.annotation.PostConstruct;
+import javax.crypto.BadPaddingException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+
+
+
+import static com.graduate.Utils.RSAUtils.myDecrypt;
+import static com.graduate.Utils.RSAUtils.myEncrypt;
 
 /**
  * @Description: TODO
  * @author: scott
  * @date: 2021年04月17日 21:05
  */
+
 public class Tools {
+
+    @Autowired
+    UserMapper userMapper;
 
     // 对字节数组字符串进行Base64解码并生成图片
     //imgFilePath 待保存的本地路径
@@ -62,5 +76,32 @@ public class Tools {
                 e.printStackTrace();
             }
         }
+    }
+
+    private static Tools tools;
+
+    @PostConstruct
+    public void init() {
+        tools = this;
+        tools.userMapper = this.userMapper;
+    }
+
+    @PostConstruct
+    public static Boolean judge(String id) throws Exception {
+        System.out.println(id);
+        try {
+            int i = new Integer(myDecrypt(id));
+            if(tools.userMapper.selectById(myDecrypt(id)) == null)
+                return false;
+            else
+                return true;
+        }
+        catch (BadPaddingException e){
+            return false;
+        }
+    }
+
+    public static Boolean judgeAuthority(String id) throws Exception {
+        return judge(id);
     }
 }

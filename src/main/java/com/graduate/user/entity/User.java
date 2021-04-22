@@ -116,4 +116,7 @@ public class User implements Serializable {
     //盐
     private String salt;
 
+    //token
+    private String token;
+
 }
