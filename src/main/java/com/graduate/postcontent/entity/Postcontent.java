@@ -4,16 +4,18 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import java.time.LocalDateTime;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
+import java.util.Date;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
  * <p>
- * 
+ *
  * </p>
  *
  * @author YanJiewei
- * @since 2021-04-22
+ * @since 2021-04-23
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -21,21 +23,21 @@ public class Postcontent implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "id", type = IdType.ID_WORKER)
+    @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
     /**
-     * 发帖人的id
+     * 发（回）帖人的id
      */
     private Integer userid;
 
     /**
-     * 发帖人的名字
+     * 发（回）帖人的名字
      */
     private String username;
 
     /**
-     * 发帖人头像url
+     * 发（回）帖人头像url
      */
     private String useravatar;
 
@@ -55,14 +57,38 @@ public class Postcontent implements Serializable {
     private Integer reply;
 
     /**
-     * 发帖时间
+     * 发（回）帖时间
      */
-    private LocalDateTime time;
+    private Date time;
 
     /**
      * 浏览量
      */
     private Integer view;
+
+    /**
+     * 是否置顶
+     */
+    private Integer hometop;
+
+    /**
+     * 是否加精
+     */
+    private Integer postboutique;
+
+    /**
+     * 记录主贴id
+     */
+    private Integer mainpostid;
+
+    /**
+     * 如果是主贴，记录最后回帖时间，方便排序
+     */
+    private Date lastpost;
+
+
+    //记录是否为主贴
+    private Integer ismainpost;
 
 
 }

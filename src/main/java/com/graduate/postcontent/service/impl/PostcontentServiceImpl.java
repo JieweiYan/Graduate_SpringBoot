@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
  * </p>
  *
  * @author YanJiewei
- * @since 2021-04-22
+ * @since 2021-04-23
  */
 @Service
 public class PostcontentServiceImpl extends ServiceImpl<PostcontentMapper, Postcontent> implements PostcontentService {

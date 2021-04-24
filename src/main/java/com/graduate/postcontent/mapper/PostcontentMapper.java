@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
  * </p>
  *
  * @author YanJiewei
- * @since 2021-04-22
+ * @since 2021-04-23
  */
 @Repository
 public interface PostcontentMapper extends BaseMapper<Postcontent> {

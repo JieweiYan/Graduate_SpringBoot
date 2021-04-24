@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * </p>
  *
  * @author YanJiewei
- * @since 2021-04-22
+ * @since 2021-04-23
  */
 public interface PostcontentService extends IService<Postcontent> {
 
