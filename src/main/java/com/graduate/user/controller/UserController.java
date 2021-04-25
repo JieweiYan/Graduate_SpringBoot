@@ -82,6 +82,7 @@ public class UserController {
         if(list.size() == 0){
             String salt = UUID.randomUUID().toString();
             user.setSalt(salt);
+            user.setAvatar("https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png");
             System.out.println(user.getPassword());
             System.out.println(DigestUtils.md5Hex(user.getPassword() + salt));
             user.setPassword(DigestUtils.md5Hex(user.getPassword() + salt));
@@ -128,6 +129,12 @@ public class UserController {
             else{
                 return null;
             }
+    }
+
+    @GetMapping("/findbyidnotoken/{id}")
+    public User findbyidnotoken(@PathVariable("id") Integer id) throws Exception {
+        User user = userMapper.selectById(id);
+        return user;
     }
 
     @PostMapping("/uploadavatar")

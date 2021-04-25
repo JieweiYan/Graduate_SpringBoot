@@ -68,16 +68,8 @@ public class PersonalbumController {
         return "true";
     }
 
-    @GetMapping("/findbyid/{userid}/{token}")
-    public String findbyuserid(@PathVariable("userid") Integer userid, @PathVariable("token") String token){
-        System.out.println("hhhhhhhh");
-        User user = userMapper.selectById(userid);
-        //如果没查到，直接返回空值
-        if(user == null)
-            return null;
-        if(!user.getToken().equals(token)){
-            return null;
-        }
+    @GetMapping("/findbyid/{userid}")
+    public String findbyuserid(@PathVariable("userid") Integer userid){
         //查出对应用户id的照片，并且按照时间排序
         QueryWrapper<Personalbum> wrapper = new QueryWrapper<>();
         wrapper.eq("userid", userid);
@@ -105,6 +97,7 @@ public class PersonalbumController {
             if(i == list.size())
                 break;
         }
+        System.out.println(JSON.toJSONString(res));
         return JSON.toJSONString(res);
     }
 
@@ -121,7 +114,6 @@ public class PersonalbumController {
         else{
             return null;
         }
-
     }
 
 }

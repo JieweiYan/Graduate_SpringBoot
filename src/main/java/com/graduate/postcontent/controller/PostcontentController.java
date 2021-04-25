@@ -240,6 +240,61 @@ public class PostcontentController {
         return postcontentMapper.selectCount(wrapper);
     }
 
+    //搜索用户
+    @PostMapping("/searchpeople/{pageid}")
+    public Page<User> searchpeople(@RequestBody User user, @PathVariable("pageid") Integer pageid)  {
+        //参数1:当前页
+        //参数2:页面大小
+        Page<User> page = new Page<>(pageid, 10);
+        QueryWrapper<User> wrapper = new QueryWrapper<>();
+        if(user.getClass1() != "")
+            wrapper.eq("class1", user.getClass1());
+        if(user.getSubject() != "")
+            wrapper.eq("subject", user.getSubject());
+        if(user.getStartyear() != "")
+            wrapper.eq("startyear", user.getStartyear());
+        if(user.getName() != "")
+            wrapper.like("name", user.getName());
+        return userMapper.selectPage(page, wrapper);
+    }
+
+    //搜索用户,返回符合条件用户数
+    @PostMapping("/searchpeoplenum")
+    public Integer searchpeoplenum(@RequestBody User user)  {
+        QueryWrapper<User> wrapper = new QueryWrapper<>();
+        if(user.getClass1() != "")
+            wrapper.eq("class1", user.getClass1());
+        if(user.getSubject() != "")
+            wrapper.eq("subject", user.getSubject());
+        if(user.getStartyear() != "")
+            wrapper.eq("startyear", user.getStartyear());
+        if(user.getName() != "")
+            wrapper.like("name", user.getName());
+        return userMapper.selectCount(wrapper);
+    }
+
+    //    //搜索用户发过的帖子帖子
+    @GetMapping("/searchpost/{userid}/{pageid}")
+    public Page<Postcontent> searchpostbyuserid(@PathVariable("userid") Integer userid , @PathVariable("pageid") Integer pageid)  {
+        //参数1:当前页
+        //参数2:页面大小
+        Page<Postcontent> page = new Page<>(pageid, 10);
+        QueryWrapper<Postcontent> wrapper = new QueryWrapper<>();
+        wrapper.like("userid", userid);
+        wrapper.eq("mainpostid", 0);
+        wrapper.orderByDesc("lastpost");
+        return postcontentMapper.selectPage(page, wrapper);
+    }
+
+    //搜索符合关键字的帖子总条数
+    @GetMapping("/searchpostnumbyuserid/{userid}")
+    public Integer searchpostnum(@PathVariable("userid") Integer userid)  {
+        QueryWrapper<Postcontent> wrapper = new QueryWrapper<>();
+        wrapper.eq("mainpostid", 0);
+        wrapper.like("userid", userid);
+        return postcontentMapper.selectCount(wrapper);
+    }
+
 
 
 }
