@@ -101,8 +101,16 @@ public class UserController {
         return userMapper.insert(user);
     }
 
-    @PostMapping("/update")
-    public int update(@RequestBody User user){
+    //修改信息
+    @PostMapping("/update/{id}/{token}")
+    public Integer update(@RequestBody User user, @PathVariable("id") Integer id, @PathVariable("token") String token){
+        User user1 = userMapper.selectById(id);
+        //如果没查到，直接返回空值
+        if(user == null)
+            return null;
+        if(!user.getToken().equals(token)){
+            return null;
+        }
         int i = userMapper.updateById(user);
         System.out.println(i);
         return i;
@@ -124,6 +132,15 @@ public class UserController {
 
     @PostMapping("/uploadavatar")
     public String uploadavatar(@RequestBody Map<String, String> param) throws IOException {
+        String token = param.get("token");
+        String id = param.get("id");
+        User user = userMapper.selectById(id);
+        //如果没查到，直接返回空值
+        if(user == null)
+            return null;
+        if(!user.getToken().equals(token)) {
+            return null;
+        }
         //base64先保存到本地
         String image = param.get("image");
         String base64Image = image.split(",", 2)[1];
@@ -140,7 +157,6 @@ public class UserController {
         System.out.println(url);
         //上传完成后删除本地文件
         file.delete();
-        String id = param.get("id");
         User user1 = userMapper.selectById(id);
         user1.setAvatar(url);
         userMapper.updateById(user1);

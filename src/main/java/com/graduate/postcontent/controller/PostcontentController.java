@@ -2,6 +2,7 @@ package com.graduate.postcontent.controller;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.graduate.classalbum.entity.Classalbum;
 import com.graduate.handler.AliyunOSSUtil;
@@ -88,6 +89,8 @@ public class PostcontentController {
     //回复帖子接口
     @PostMapping("/reply/{mainpostid}/{id}/{token}")
     public String reply(@PathVariable("mainpostid") Integer mainpostid, @PathVariable("id") Integer id, @PathVariable("token") String token, @RequestBody Postcontent postcontent) {
+        System.out.println(mainpostid);
+        System.out.println("hhhhhh");
         User user = userMapper.selectById(id);
         //如果没查到，直接返回空值
         if(user == null)
@@ -136,28 +139,47 @@ public class PostcontentController {
 
     //根据id查看帖子
     //这里拿到的postid是主贴id
-    @GetMapping("/findpostbyid/{postid}")
-    public Map<String, Object> findpostbyid(@PathVariable("postid") Integer postid)  {
+    @GetMapping("/findpostbyid/{postid}/{pageid}")
+    public Map<String, Object> findpostbyid(@PathVariable("postid") Integer postid,@PathVariable("pageid") Integer pageid)  {
         Map<String, Object> map = new HashMap<>();
         Postcontent mainpost = postcontentMapper.selectById(postid);
         map.put("mainposttitle", mainpost.getTitle());
         //每次查询，浏览量+1
         mainpost.setView(mainpost.getView() + 1);
         postcontentMapper.updateById(mainpost);
-        //查出所有回帖内容
+        //查出对应页回帖内容
         QueryWrapper<Postcontent> wrapper = new QueryWrapper<>();
         wrapper.eq("mainpostid", postid);
         wrapper.orderByAsc("time");
-        List<Postcontent> replylist = postcontentMapper.selectList(wrapper);
-        //再查出主贴内容
-        QueryWrapper<Postcontent> wrapper1 = new QueryWrapper<>();
-        wrapper1.eq("id", postid);
-        wrapper1.eq("mainpostid", 0);
-        List<Postcontent> mainpostlist = postcontentMapper.selectList(wrapper1);
-        //再拼接起来
-        mainpostlist.addAll(replylist);
-        map.put("replypostlist", mainpostlist);
-        return map;
+        if(pageid == 1){
+            Page<Postcontent> page = new Page<>(pageid, 11);
+            Page<Postcontent> replylist = postcontentMapper.selectPage(page, wrapper);
+            //再查出主贴内容
+            QueryWrapper<Postcontent> wrapper1 = new QueryWrapper<>();
+            wrapper1.eq("id", postid);
+            wrapper1.eq("mainpostid", 0);
+            List<Postcontent> mainpostlist = postcontentMapper.selectList(wrapper1);
+            //再拼接起来
+            map.put("mainpost", mainpostlist);
+            map.put("replypostlist", replylist);
+            return map;
+        }
+        else{
+            //因为不是第一页，所以不需要去查主贴了
+            Page<Postcontent> page = new Page<>(pageid, 11);
+            Page<Postcontent> replylist = postcontentMapper.selectPage(page, wrapper);
+            map.put("replypostlist", replylist);
+            return map;
+        }
+    }
+
+    //根据id查看回帖条数
+    //这里拿到的postid是主贴id
+    @GetMapping("/findpostnumbyid/{postid}")
+    public Integer findpostnumbyid(@PathVariable("postid") Integer postid)  {
+        QueryWrapper<Postcontent> wrapper = new QueryWrapper<>();
+        wrapper.eq("mainpostid", postid);
+        return postcontentMapper.selectCount(wrapper) + 1;
     }
 
     //本周热榜
@@ -192,6 +214,30 @@ public class PostcontentController {
         wrapper.gt("lastpost", date);
         List<Postcontent> hotpostlist = postcontentMapper.selectList(wrapper);
         return hotpostlist;
+    }
+
+//    //搜索帖子
+    @PostMapping("/searchpost/{pageid}")
+    public Page<Postcontent> searchpost(@RequestBody Map<String, String> map, @PathVariable("pageid") Integer pageid)  {
+        //参数1:当前页
+        //参数2:页面大小
+        String tag = map.get("tag");
+        Page<Postcontent> page = new Page<>(pageid, 10);
+        QueryWrapper<Postcontent> wrapper = new QueryWrapper<>();
+        wrapper.like("title", tag);
+        wrapper.eq("mainpostid", 0);
+        wrapper.orderByDesc("lastpost");
+        return postcontentMapper.selectPage(page, wrapper);
+    }
+
+    //搜索符合关键字的帖子总条数
+    @PostMapping("/searchpostnum")
+    public Integer searchpostnum(@RequestBody Map<String, String> map)  {
+        String tag = map.get("tag");
+        QueryWrapper<Postcontent> wrapper = new QueryWrapper<>();
+        wrapper.eq("mainpostid", 0);
+        wrapper.like("title", tag);
+        return postcontentMapper.selectCount(wrapper);
     }
 
 
