@@ -29,7 +29,7 @@ public class AutoGeneratorCode {
         gc.setOpen(false);
         gc.setFileOverride(false);
         gc.setServiceName("%sService");
-        gc.setIdType(IdType.ID_WORKER);
+        gc.setIdType(IdType.AUTO);
         mpg.setGlobalConfig(gc);
 
         //设置数据源
@@ -43,7 +43,7 @@ public class AutoGeneratorCode {
 
         //包的配置
         PackageConfig pc = new PackageConfig();
-        pc.setModuleName("postcontent");
+        pc.setModuleName("notice");
         pc.setParent("com.graduate");
         pc.setEntity("entity");
         pc.setMapper("mapper");
@@ -52,7 +52,7 @@ public class AutoGeneratorCode {
         mpg.setPackageInfo(pc);
 
         StrategyConfig strategy = new StrategyConfig();
-        strategy.setInclude("postcontent");//设置要映射的表名
+        strategy.setInclude("notice");//设置要映射的表名
         strategy.setNaming(NamingStrategy.underline_to_camel);//下划线转驼峰命名
         strategy.setColumnNaming(NamingStrategy.underline_to_camel);
         strategy.setEntityLombokModel(true);

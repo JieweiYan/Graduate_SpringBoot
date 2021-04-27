@@ -53,7 +53,7 @@ public class User implements Serializable {
     /**
      * 出生日期
      */
-    private LocalDate birthday;
+    private Date birthday;
 
     /**
      * 专业
@@ -118,5 +118,11 @@ public class User implements Serializable {
 
     //token
     private String token;
+
+    //记录是否为管理员
+    private Integer isadmin;
+
+    //是否有发布活动的权限
+    private  Integer haveauthority;
 
 }

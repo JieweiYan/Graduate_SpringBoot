@@ -86,6 +86,7 @@ public class UserController {
             System.out.println(user.getPassword());
             System.out.println(DigestUtils.md5Hex(user.getPassword() + salt));
             user.setPassword(DigestUtils.md5Hex(user.getPassword() + salt));
+            user.setHaveauthority(0);
             userMapper.insert(user);
             return "200";
         }
@@ -98,7 +99,6 @@ public class UserController {
 
     @PostMapping("/insert")
     public int insert(@RequestBody User user){
-
         return userMapper.insert(user);
     }
 
@@ -229,6 +229,23 @@ public class UserController {
         userMapper.updateById(user);
         return JSON.toJSONString(user1);
     }
+
+    //查询用户是否有发布活动的权限
+    @GetMapping("/haveauthority/{id}/{token}")
+    public Integer haveauthority(@PathVariable("id") Integer id, @PathVariable("token") String token) throws Exception {
+        User user = userMapper.selectById(id);
+        //如果没查到，直接返回空值
+        if(user == null)
+            return null;
+        if(user.getToken().equals(token)){
+            return user.getHaveauthority();
+        }
+        else{
+            return null;
+        }
+    }
+
+
 
 
 }
