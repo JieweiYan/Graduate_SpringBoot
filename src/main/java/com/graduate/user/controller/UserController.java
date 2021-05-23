@@ -87,6 +87,7 @@ public class UserController {
             System.out.println(DigestUtils.md5Hex(user.getPassword() + salt));
             user.setPassword(DigestUtils.md5Hex(user.getPassword() + salt));
             user.setHaveauthority(0);
+            user.setIsadmin(0);
             userMapper.insert(user);
             return "200";
         }
@@ -239,6 +240,22 @@ public class UserController {
             return null;
         if(user.getToken().equals(token)){
             return user.getHaveauthority();
+        }
+        else{
+            return null;
+        }
+    }
+
+    //查询用户是否有更改公告的权限（是否是管理员）
+    @GetMapping("/isadmin/{id}/{token}")
+    public Integer isadmin(@PathVariable("id") Integer id, @PathVariable("token") String token) throws Exception {
+        User user = userMapper.selectById(id);
+        //如果没查到，直接返回空值
+        if(user == null)
+            return null;
+        if(user.getToken().equals(token)){
+            System.out.println(user.getIsadmin());
+            return user.getIsadmin();
         }
         else{
             return null;

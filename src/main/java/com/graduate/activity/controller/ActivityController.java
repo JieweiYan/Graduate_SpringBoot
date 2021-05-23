@@ -126,7 +126,7 @@ public class ActivityController {
 
     //导出参加活动人员的excel
     @GetMapping("/exportexcel/{activityid}")
-    public void exportexcel(@PathVariable("activityid") Integer activityid,HttpServletResponse response) throws IOException {
+    public void exportexcel(@PathVariable("activityid") Integer activityid,  HttpServletResponse response) throws IOException {
         Activity activity = activityMapper.selectById(activityid);
         HSSFWorkbook workbook = new HSSFWorkbook();
         HSSFSheet sheet = workbook.createSheet("人员信息");
