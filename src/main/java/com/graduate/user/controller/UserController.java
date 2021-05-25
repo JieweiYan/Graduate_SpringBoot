@@ -125,9 +125,31 @@ public class UserController {
         if(!user.getToken().equals(token)){
             return null;
         }
-        int i = userMapper.updateById(user);
-        System.out.println(i);
-        return i;
+        int k = userMapper.updateById(user);
+        //将所有该用户发布的帖子信息查出来
+        //然后更新帖子的名字，避免出现更改了名字而帖子的名字却没更新的情况
+        QueryWrapper<Postcontent> wrapper = new QueryWrapper<>();
+        wrapper.eq("userid", id);
+        List<Postcontent> postlist = postcontentMapper.selectList(wrapper);
+        for(int i = 0; i < postlist.size(); i++){
+            Postcontent post = postlist.get(i);
+            post.setUsername(user.getName());
+            postcontentMapper.updateById(post);
+        }
+
+        //将所有该用户回复的班级聊天室消息查出来
+        //然后更新消息的名字，避免出现换了名字而消息的名字却没更新的情况
+        QueryWrapper<Chatroommassage> wrapper1 = new QueryWrapper<>();
+        wrapper1.eq("userid", id);
+        List<Chatroommassage> massageslist = chatroommassageMapper.selectList(wrapper1);
+        for(int i = 0; i < massageslist.size(); i++){
+            Chatroommassage massage = massageslist.get(i);
+            massage.setUsername(user.getName());
+            chatroommassageMapper.updateById(massage);
+        }
+
+        System.out.println(k);
+        return k;
     }
 
     @GetMapping("/findbyid/{id}/{token}")
