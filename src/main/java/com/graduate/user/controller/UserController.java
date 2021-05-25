@@ -2,7 +2,13 @@ package com.graduate.user.controller;
 
 
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.graduate.chatroommassage.entity.Chatroommassage;
+import com.graduate.chatroommassage.mapper.ChatroommassageMapper;
 import com.graduate.handler.AliyunOSSUtil;
+import com.graduate.personalbum.entity.Personalbum;
+import com.graduate.postcontent.entity.Postcontent;
+import com.graduate.postcontent.mapper.PostcontentMapper;
 import com.graduate.user.entity.User;
 import com.graduate.user.mapper.UserMapper;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -37,6 +43,12 @@ public class UserController {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private PostcontentMapper postcontentMapper;
+
+    @Autowired
+    private ChatroommassageMapper chatroommassageMapper;
 
     @PostMapping("/login")
     public String login(@RequestBody User user) throws Exception {
@@ -168,6 +180,29 @@ public class UserController {
         User user1 = userMapper.selectById(id);
         user1.setAvatar(url);
         userMapper.updateById(user1);
+
+        //将所有该用户发布的帖子信息查出来
+        //然后更新帖子的头像，避免出现换了头像而帖子的头像却没更新的情况
+        QueryWrapper<Postcontent> wrapper = new QueryWrapper<>();
+        wrapper.eq("userid", user1.getId());
+        List<Postcontent> postlist = postcontentMapper.selectList(wrapper);
+        for(int i = 0; i < postlist.size(); i++){
+            Postcontent post = postlist.get(i);
+            post.setUseravatar(url);
+            postcontentMapper.updateById(post);
+        }
+
+        //将所有该用户回复的班级聊天室消息查出来
+        //然后更新消息的头像，避免出现换了头像而消息的头像却没更新的情况
+        QueryWrapper<Chatroommassage> wrapper1 = new QueryWrapper<>();
+        wrapper1.eq("userid", user1.getId());
+        List<Chatroommassage> massageslist = chatroommassageMapper.selectList(wrapper1);
+        for(int i = 0; i < massageslist.size(); i++){
+            Chatroommassage massage = massageslist.get(i);
+            System.out.println(massage.getUserid());
+            massage.setUseravatar(url);
+            chatroommassageMapper.updateById(massage);
+        }
         return JSON.toJSONString(user1);
     }
 
