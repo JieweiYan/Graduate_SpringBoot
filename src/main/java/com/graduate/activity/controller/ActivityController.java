@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.graduate.activity.entity.Activity;
 import com.graduate.activity.mapper.ActivityMapper;
+import com.graduate.handler.AliyunOSSUtil;
 import com.graduate.participateactivity.entity.Participateactivity;
 import com.graduate.participateactivity.mapper.ParticipateactivityMapper;
 import com.graduate.postcontent.entity.Postcontent;
@@ -16,9 +17,13 @@ import org.springframework.web.bind.annotation.*;
 
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * <p>
@@ -84,8 +89,56 @@ public class ActivityController {
 
     //根据活动id查找活动
     @GetMapping("/findactivitybyid/{activityid}")
-    public Activity findactivitybyid(@PathVariable("activityid") Integer activityid)  {
-        return activityMapper.selectById(activityid);
+    public Activity findactivitybyid(@PathVariable("activityid") Integer activityid) throws IOException {
+        Activity activity = activityMapper.selectById(activityid);
+        HSSFWorkbook workbook = new HSSFWorkbook();
+        HSSFSheet sheet = workbook.createSheet("人员信息");
+        // 设置要导出的文件的名字
+        String fileName = activity.getActivityname() + "人员信息表.xls";
+        System.out.println(fileName);
+        // 新增数据行，并且设置单元格数据
+        int rowNum = 1;
+
+        // headers表示excel表中第一行的表头 在excel表中添加表头
+        String[] headers = { "姓名", "性别", "专业", "入学年份", "班级", "电话号码", "微信号"};
+        HSSFRow row = sheet.createRow(0);
+        for(int i=0;i<headers.length;i++){
+            HSSFCell cell = row.createCell(i);
+            HSSFRichTextString text = new HSSFRichTextString(headers[i]);
+            cell.setCellValue(text);
+        }
+
+        QueryWrapper<Participateactivity> wrapper = new QueryWrapper<>();
+        wrapper.eq("activityid", activityid);
+        List<Participateactivity> list = participateactivityMapper.selectList(wrapper);
+
+        //在表中存放查询到的数据放入对应的列
+        for (Participateactivity item : list) {
+            User user = userMapper.selectById(item.getUserid());
+            HSSFRow row1 = sheet.createRow(rowNum);
+            row1.createCell(0).setCellValue(user.getName());
+            row1.createCell(1).setCellValue(user.getSex());
+            row1.createCell(2).setCellValue(user.getSubject());
+            row1.createCell(3).setCellValue(user.getStartyear());
+            row1.createCell(4).setCellValue(user.getClass1());
+            row1.createCell(5).setCellValue(user.getTelnum());
+            row1.createCell(6).setCellValue(user.getWechatnum());
+            rowNum++;
+        }
+
+        File file = File.createTempFile(UUID.randomUUID().toString(),".xls");
+        workbook.write(new FileOutputStream(file));
+        //然后上传本地文件到阿里云oss
+        AliyunOSSUtil aliyunOSSUtil = new AliyunOSSUtil();
+        String url = aliyunOSSUtil.upLoad(file);
+        System.out.println(url);
+        url = url.substring(15);
+        Date date = new Date();
+        SimpleDateFormat dateFormat=new SimpleDateFormat("YYYY-MM-dd");
+        url = "https://raduate-project1998.oss-cn-hangzhou.aliyuncs.com/" + url;
+        System.out.println(url);
+        activity.setUrl(url);
+        return activity;
     }
 
     //查询用户是否已参加活动
@@ -126,7 +179,7 @@ public class ActivityController {
 
     //导出参加活动人员的excel
     @GetMapping("/exportexcel/{activityid}")
-    public void exportexcel(@PathVariable("activityid") Integer activityid,  HttpServletResponse response) throws IOException {
+    public String exportexcel(@PathVariable("activityid") Integer activityid,  HttpServletResponse response) throws IOException {
         Activity activity = activityMapper.selectById(activityid);
         HSSFWorkbook workbook = new HSSFWorkbook();
         HSSFSheet sheet = workbook.createSheet("人员信息");
@@ -167,6 +220,21 @@ public class ActivityController {
         response.setContentType("application/vnd.ms-excel;charset=gb2312");
         response.flushBuffer();
         workbook.write(response.getOutputStream());
+
+        File file = File.createTempFile(UUID.randomUUID().toString(),".xls");
+        workbook.write(new FileOutputStream(file));
+        //然后上传本地文件到阿里云oss
+        AliyunOSSUtil aliyunOSSUtil = new AliyunOSSUtil();
+        String url = aliyunOSSUtil.upLoad(file);
+        System.out.println(url);
+        url = url.substring(15);
+        Date date = new Date();
+        SimpleDateFormat dateFormat=new SimpleDateFormat("YYYY-MM-dd");
+        url = "https://raduate-project1998.oss-cn-hangzhou.aliyuncs.com/" + url;
+        System.out.println(url);
+        return url;
+
+
     }
 
 

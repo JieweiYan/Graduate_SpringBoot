@@ -73,5 +73,7 @@ public class Activity implements Serializable {
      */
     private Date starttime;
 
+    private String url;
+
 
 }
