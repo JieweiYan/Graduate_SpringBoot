@@ -190,10 +190,10 @@ public class UserController {
         String path = System.getProperty("user.dir");
         System.out.println(path);
         String name = UUID.randomUUID().toString() + ".jpg";
-        OutputStream out = new FileOutputStream(path + "\\" + name);
+        OutputStream out = new FileOutputStream(name);
         base64ToImageOutput(base64Image, out);
         //然后上传本地文件到阿里云oss
-        File file = new File(path + "\\" + name);
+        File file = new File(name);
         AliyunOSSUtil aliyunOSSUtil = new AliyunOSSUtil();
         String url = aliyunOSSUtil.upLoad(file);
         System.out.println(url);
@@ -272,10 +272,10 @@ public class UserController {
         String path = System.getProperty("user.dir");
         System.out.println(path);
         String name = UUID.randomUUID().toString() + ".jpg";
-        OutputStream out = new FileOutputStream(path + "\\" + name);
+        OutputStream out = new FileOutputStream(name);
         base64ToImageOutput(base64Image, out);
         //然后上传本地文件到阿里云oss
-        File file = new File(path + "\\" + name);
+        File file = new File(name);
         AliyunOSSUtil aliyunOSSUtil = new AliyunOSSUtil();
         String url = aliyunOSSUtil.upLoad(file);
         System.out.println(url);
