@@ -123,6 +123,8 @@ public class User implements Serializable {
     private Integer isadmin;
 
     //是否有发布活动的权限
-    private  Integer haveauthority;
+    private  Boolean haveauthority;
+
+    private Boolean sfnfy;
 
 }

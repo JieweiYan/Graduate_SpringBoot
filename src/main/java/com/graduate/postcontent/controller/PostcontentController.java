@@ -296,5 +296,17 @@ public class PostcontentController {
     }
 
 
+    @PostMapping("/delete/{postid}")
+    public Integer delete(@PathVariable("postid") Integer postid)  {
+        return postcontentMapper.deleteById(postid);
+    }
+
+    @GetMapping("/getallpost")
+    public List<Postcontent> getAllPost(){
+        QueryWrapper<Postcontent> wrapper = new QueryWrapper<>();
+        wrapper.eq("mainpostid", 0);
+        wrapper.orderByDesc("lastpost");
+        return postcontentMapper.selectList(wrapper);
+    }
 
 }
