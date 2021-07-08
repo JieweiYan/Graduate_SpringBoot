@@ -215,18 +215,15 @@ public class UserController {
         String path = System.getProperty("user.dir");
         System.out.println(path);
         String name = UUID.randomUUID().toString() + ".jpg";
-//        OutputStream out = new FileOutputStream(path + "\\" + name);
-        OutputStream out = new FileOutputStream(name);
-
+        OutputStream out = new FileOutputStream(path + "\\" + name);
         base64ToImageOutput(base64Image, out);
         //然后上传本地文件到阿里云oss
-//        File file = new File(path + "\\" + name);
-        File file = new File(name);
+        File file = new File(path + "\\" + name);
         AliyunOSSUtil aliyunOSSUtil = new AliyunOSSUtil();
         String url = aliyunOSSUtil.upLoad(file);
         System.out.println(url);
         //上传完成后删除本地文件
-//        file.delete();
+        file.delete();
         User user = JSON.parseObject(param.get("user"), User.class);
         User user1 = userMapper.selectById(user.getId());
         user1.setAvatar(url);
