@@ -4,6 +4,8 @@ import com.graduate.notice.entity.Notice;
 import com.graduate.notice.mapper.NoticeMapper;
 import com.graduate.notice.service.NoticeService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 /**

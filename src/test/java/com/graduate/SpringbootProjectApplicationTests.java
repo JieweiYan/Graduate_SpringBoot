@@ -8,6 +8,8 @@ import com.graduate.justtest.entity.Justtest;
 import com.graduate.justtest.mapper.JusttestMapper;
 import com.graduate.personalbum.entity.Personalbum;
 import com.graduate.personalbum.mapper.PersonalbumMapper;
+import com.graduate.postcontent.entity.Postcontent;
+import com.graduate.postcontent.mapper.PostcontentMapper;
 import com.graduate.user.entity.User;
 import com.graduate.user.mapper.UserMapper;
 import org.junit.jupiter.api.Test;
@@ -36,6 +38,8 @@ class SpringbootProjectApplicationTests {
     @Autowired
     private PersonalbumMapper personalbumMapper;
 
+    @Autowired
+    private PostcontentMapper postcontentMapper;
 
 //
     @Test
@@ -52,6 +56,14 @@ class SpringbootProjectApplicationTests {
         AliyunOSSUtil aliyunOSSUtil = new AliyunOSSUtil();
         String url = aliyunOSSUtil.upLoad(file);
         System.out.println(url);
+    }
+
+    @Test
+    void selectpost(){
+        QueryWrapper<Postcontent> wrapper = new QueryWrapper<>();
+        wrapper.eq("mainpostid", 0);
+        wrapper.orderByDesc("lastpost");
+        postcontentMapper.selectList(wrapper);
     }
 
     @Test

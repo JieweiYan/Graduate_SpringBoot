@@ -126,6 +126,7 @@ public class PostcontentController {
         QueryWrapper<Postcontent> wrapper = new QueryWrapper<>();
         wrapper.eq("mainpostid", 0);
         wrapper.orderByDesc("lastpost");
+        postcontentMapper.selectList(wrapper);
         return postcontentMapper.selectPage(page, wrapper);
     }
 
